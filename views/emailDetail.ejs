@@ -1,0 +1,33 @@
+<%- include('layout', { pageTitle: 'Email Detail'}) %>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="/css/style.css" rel="stylesheet" type="text/css" />
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>Email Detail</h1>
+
+      <% if (email) { %>
+      <h2><%= email.subject || '(no subject)' %></h2>
+      <p id="from">From: <%= email.senderEmail %></p>
+      <p id="to">To: <%= email.receiverEmail %></p>
+
+      <p id="time">Sent at: <%= email.sent_at %></p>
+      <p id="message"><%= email.message %></p>
+
+      <% if (email.attachment) { %>
+      <p id="attachment">
+        Attachment:
+        <a href="/download/<%= email.attachment %>">Download Attachment</a>
+      </p>
+      <% } %> <% } else { %>
+      <p>Email not found.</p>
+      <% } %>
+    </div>
+  </body>
+</html>

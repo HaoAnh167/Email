@@ -1,0 +1,55 @@
+<%- include('layout', { pageTitle: 'Compose Email'}) %>
+<div class="container">
+  <h1>Compose Email</h1>
+
+  <% if (locals.error) { %>
+  <p style="color: red"><%= locals.error %></p>
+  <% } else if (locals.success) { %>
+  <p style="color: green"><%= locals.success %></p>
+  <% } %>
+
+  <form
+    id="compose_form"
+    action="/compose"
+    method="post"
+    enctype="multipart/form-data"
+  >
+    <label for="recipient">Recipient:</label>
+    <select name="recipient" id="recipient">
+      <option value="" selected disabled>Select recipient</option>
+      <% users.forEach(user => { %>
+      <option value="<%= user.id %>"><%= user.full_name %></option>
+      <% }); %>
+    </select>
+
+    <br />
+
+    <label for="subject">Subject:</label>
+    <input
+      class="input_compose"
+      type="text"
+      name="subject"
+      id="subject"
+      placeholder="(no subject)"
+    />
+
+    <br />
+
+    <label for="body">Body:</label>
+    <textarea name="body" id="body" rows="4"></textarea>
+
+    <br />
+
+    <label for="attachment">Attachment:</label>
+    <input
+      class="input_compose"
+      type="file"
+      id="attachment"
+      name="attachment"
+    />
+
+    <br />
+
+    <button type="submit">Send</button>
+  </form>
+</div>

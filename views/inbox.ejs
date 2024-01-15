@@ -1,0 +1,101 @@
+<%- include('layout', { pageTitle: 'Inbox'}) %>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="/css/style.css" rel="stylesheet" type="text/css" />
+  </head>
+
+  <body>
+    <div class="inbox_container">
+      <h1>Inbox</h1>
+      <% if (emails && emails.length > 0) { %>
+      <ul id="inbox_ul">
+        <% emails.forEach(email => { %>
+        <li class="inbox_li" onclick="location.href='/email/<%= email.id %>';">
+          <div class="email-details">
+            <input
+              type="checkbox"
+              class="email-checkbox"
+              data-email-id="<%= email.id %>"
+              onclick="event.stopPropagation();"
+            />
+            <div class="sender">
+              <strong><%= email.senderFullName %></strong>
+            </div>
+            <div class="subject"><%= email.subject || '(no subject)' %></div>
+            <div class="date"><%= email.sent_at %></div>
+          </div>
+        </li>
+        <% }); %>
+      </ul>
+
+      <!--Pagination-->
+      <div class="pagination">
+        <% if (currentPage > 1) { %>
+        <a href="/inbox?page=<%= currentPage - 1 %>">&larr;</a>
+        <% } %> <% const maxPagesToShow = 5; %> <% const startPage = Math.max(1,
+        currentPage - Math.floor(maxPagesToShow / 2)); %> <% const endPage =
+        Math.min(totalPages, startPage + maxPagesToShow - 1); %> <% for (let i =
+        startPage; i <= endPage; i++) { %>
+        <a
+          href="/inbox?page=<%= i %>"
+          class="<%= i === currentPage ? 'active' : '' %>"
+          ><%= i %></a
+        >
+        <% } %> <% if (currentPage < totalPages) { %>
+        <a href="/inbox?page=<%= currentPage + 1 %>">&rarr;</a>
+        <% } %>
+      </div>
+
+      <!-- Delete Button -->
+      <button id="deleteButton">Delete Selected</button>
+
+      <script>
+        document
+          .getElementById("deleteButton")
+          .addEventListener("click", async () => {
+            const selectedEmails = document.querySelectorAll(
+              ".email-checkbox:checked"
+            );
+            const emailIds = Array.from(selectedEmails).map(
+              (checkbox) => checkbox.dataset.emailId
+            );
+
+            if (emailIds.length > 0) {
+              try {
+                const response = await fetch("/delete-emails", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({ emailIds }),
+                });
+
+                if (response.ok) {
+                  emailIds.forEach((emailId) => {
+                    const emailElement = document.querySelector(
+                      `[data-email-id="${emailId}"]`
+                    );
+                    if (emailElement) {
+                      emailElement.closest("li").remove();
+                    }
+                  });
+                } else {
+                  console.error("Failed to delete emails");
+                }
+              } catch (error) {
+                console.error("Error deleting emails:", error);
+              }
+            }
+          });
+      </script>
+
+      <% } else { %>
+      <p>No emails in the inbox.</p>
+      <% } %>
+    </div>
+  </body>
+</html>
